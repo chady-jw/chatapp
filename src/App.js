@@ -1,25 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Chat, { Bubble, useMessages } from '@chatui/core';
+import '@chatui/core/dist/index.css';
+import axios from 'axios';
 
-function App() {
+const App = () => {
+  const { messages, appendMsg, setTyping } = useMessages([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  function handleSend(type, val) {
+    if (type === 'text' && val.trim()) {
+      appendMsg({
+        type: 'text',
+        content: { text: val },
+        position: 'right',
+      });
+
+      setTyping(true);
+      setIsLoading(true);
+
+      axios
+        .post('http://137.74.193.119:5353/get_response', { userSpeech: val })
+        .then((response) => {
+          const aiResponse = response.data.response;
+
+          appendMsg({
+            type: 'text',
+            content: { text: aiResponse },
+            position: 'left',
+          });
+
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsLoading(false);
+        });
+    }
+  }
+
+  function renderMessageContent(msg) {
+    const { content } = msg;
+    return <Bubble content={content.text} />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Chat
+      navbar={{ title: 'Assistant' }}
+      messages={messages}
+      renderMessageContent={renderMessageContent}
+      onSend={handleSend}
+      placeholder="Type a message..."
+      isLoading={isLoading}
+    />
   );
-}
+};
 
 export default App;
