@@ -25,7 +25,7 @@ const App = () => {
 
           appendMsg({
             type: 'text',
-            content: { text: aiResponse },
+            content: { text: "OK"+aiResponse },
             position: 'left',
           });
 
