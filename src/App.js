@@ -19,7 +19,7 @@ const App = () => {
       setIsLoading(true);
 
       axios
-        .post('http://137.74.193.119:5353/get_response', { userSpeech: val })
+        .post('https://137.74.193.119:5353/get_response', { userSpeech: val })
         .then((response) => {
           const aiResponse = response.data.response;
 
